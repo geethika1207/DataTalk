@@ -3,6 +3,7 @@ import os
 from sqlalchemy.orm import Session
 from ..db.database import get_db
 from ..db import models
+from ..services.csv_service import create_summary
 from ..core.security import get_current_user
 from ..schemas import dataset
 
@@ -29,13 +30,15 @@ async def upload_dataset(
     with open(filepath, "wb") as f:
         content = await file.read()
         f.write(content)
+    summary = create_summary(filepath)
     
     # create a new row in database
     new_dataset = models.dataset(
         filename=filename,
         filepath=filepath,
         title=title,
-        user_id=current_user.id
+        user_id=current_user.id,
+        summary=summary
     )
     
     db.add(new_dataset)

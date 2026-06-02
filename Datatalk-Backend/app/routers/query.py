@@ -21,8 +21,7 @@ async def create_query(
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
     
-    filepath = dataset.filepath
-    summary_data = csv_service.create_summary(filepath)
+    summary_data = dataset.summary
     prompt = ai_service.create_prompt(summary_data, question.question)
     answer, charts = ai_service.ask_gemini(prompt)
     

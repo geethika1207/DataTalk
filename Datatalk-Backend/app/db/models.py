@@ -19,6 +19,7 @@ class dataset(Base):
     filepath = Column(String, unique=True, nullable = False)
     filename = Column(String,  nullable = False)
     title = Column(String, nullable = False)
+    summary = Column(String, nullable = True)
     user_id = Column(INTEGER, ForeignKey("Users.id", ondelete = "CASCADE"), nullable = False)  
     created_at = Column(TIMESTAMP(timezone=True), nullable = False, server_default = text('now()'))
     queries = relationship("Query")
