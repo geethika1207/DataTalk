@@ -105,7 +105,7 @@ export default function Auth({ onLogin }) {
         setSuccess("Account created! Please sign in.");
         setIsLogin(true);
       }
-    } catch { setError("Network error. Is your backend running?"); }
+    } catch { setError("Server is waking up, please wait 30 seconds and try again."); }
     finally { setLoading(false); }
   };
 
