@@ -1,5 +1,6 @@
 from fastapi import APIRouter, File, UploadFile, Form, Depends, HTTPException, status
 import os
+import time
 from sqlalchemy.orm import Session
 from ..db.database import get_db
 from ..db import models
@@ -24,7 +25,7 @@ async def upload_dataset(
         raise HTTPException(status_code=400, detail="Only CSV files are allowed")
     
     # Unique filepath
-    filepath = f"uploads/{current_user.id}-{filename}"
+    filepath = f"uploads/{current_user.id}-{int(time.time())}-{filename}"    
     
     # save actual file into folder
     with open(filepath, "wb") as f:

@@ -30,6 +30,12 @@ def create_prompt(summary, question):
     }}
 
     Remember: Return only JSON. No extra text!
+    If the question is a greeting (like hello, hi, good morning, good evening, good night, how are you, etc.),
+    respond naturally and friendly. For example:
+    - "hello" → "Hello! How can I help you analyze your data today?"
+    - "good morning" → "Good morning! Ready to explore your dataset?"
+    Do NOT return "This question is not related to the dataset" for greetings.
+    
     If the question is not related to the dataset
     return {{"answer": "This question is not related to the dataset", "charts": null}}
 
