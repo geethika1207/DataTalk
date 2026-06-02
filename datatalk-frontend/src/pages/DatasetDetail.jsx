@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-const API = "http://127.0.0.1:8000";
+const API = "https://datatalk-5.onrender.com";
 const COLORS = ["#6366f1","#14b8a6","#fbbf24","#f87171","#818cf8","#34d399"];
 
 const CustomTooltip = ({ active, payload, label }) => {

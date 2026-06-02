@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API = "http://127.0.0.1:8000";
+const API = "https://datatalk-5.onrender.com";
 
 const S = {
   page: { minHeight:"100vh", display:"flex", background:"#0a0f1a" },
