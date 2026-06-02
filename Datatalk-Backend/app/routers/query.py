@@ -22,6 +22,7 @@ async def create_query(
         raise HTTPException(status_code=404, detail="Dataset not found")
     
     summary_data = dataset.summary
+    print(f"SUMMARY: {summary_data[:200] if summary_data else 'NONE'}")  
     prompt = ai_service.create_prompt(summary_data, question.question)
     answer, charts = ai_service.ask_gemini(prompt)
     
