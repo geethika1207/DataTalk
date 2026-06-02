@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from ..core.config import settings
-import google.generativeai as genai
 import json
 def create_prompt(summary, question):
     prompt = f"""
