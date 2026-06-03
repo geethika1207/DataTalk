@@ -10,7 +10,7 @@ The goal is to make data analysis accessible to everyone—from students and non
 https://data-talk-1qmc.vercel.app/
 
 **Backend**
-https://datatalk-xq73.onrender.com
+https://datatalk-xq73.onrender.com/docs
 
 --- 
 
