@@ -184,7 +184,7 @@ Several deployment-specific issues emerged while connecting the AI layer, includ
 
 ## Author
 
-**Geethika Tammineni**
+**Geethika Nagasri Tammineni**
 
 Aspiring Software Engineer | Backend Development | AI-Powered Applications
 
