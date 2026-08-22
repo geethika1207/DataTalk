@@ -1,4 +1,3 @@
-# tells git ignore this files/folders
 venv/
 .env
 __pycache__/
