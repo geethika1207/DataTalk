@@ -13,7 +13,6 @@ if "token" not in st.session_state:
     st.session_state.token = None
 if "dataset_id" not in st.session_state:
     st.session_state.dataset_id = None
-# Swapped single-question states for a persistent messages list
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -29,7 +28,6 @@ with st.sidebar:
             log_email = st.text_input("Email", key="log_email")
             log_pass = st.text_input("Password", type="password", key="log_pass")
             if st.button("Login"):
-                # Professional UX copy
                 with st.spinner("Authenticating securely... This may take a moment."):
                     res = requests.post(f"{API_URL}/login", data={"username": log_email, "password": log_pass})
                     if res.status_code == 201 or res.status_code == 200:
@@ -42,7 +40,6 @@ with st.sidebar:
             reg_email = st.text_input("Email", key="reg_email")
             reg_pass = st.text_input("Password", type="password", key="reg_pass")
             if st.button("Register"):
-                # Professional UX copy
                 with st.spinner("Setting up your account workspace..."):
                     res = requests.post(f"{API_URL}/user", json={"email": reg_email, "password": reg_pass})
                     if res.status_code == 201:
@@ -60,27 +57,29 @@ with st.sidebar:
         st.divider()
         st.subheader("📁 Dataset Management")
         
-        # Lock uploader after one dataset is active
         if st.session_state.dataset_id:
-            st.success("Your dataset is linked and ready for analysis.")
-            st.info("To analyze a different dataset, please log out and start a new session.")
-        else:
-            uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-            title = st.text_input("Dataset Title", value="My Dataset")
+            st.success("Active Dataset is linked and ready.")
+            st.write("Upload a new file to start a fresh analysis:")
             
-            if uploaded_file and st.button("Upload & Analyze"):
-                with st.spinner("Parsing dataset structure..."):
-                    headers = {"Authorization": f"Bearer {st.session_state.token}"}
-                    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "text/csv")}
-                    data = {"title": title}
-                    
-                    res = requests.post(f"{API_URL}/datasets/upload", headers=headers, files=files, data=data)
-                    
-                    if res.status_code == 201:
-                        st.session_state.dataset_id = res.json()["dataset_id"]
-                        st.rerun()
-                    else:
-                        st.error("Upload failed. Please check your file.")
+        uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+        title = st.text_input("Dataset Title", value="My Dataset")
+        
+        if uploaded_file and st.button("Upload & Start Fresh"):
+            with st.spinner("Parsing new dataset structure..."):
+                headers = {"Authorization": f"Bearer {st.session_state.token}"}
+                files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "text/csv")}
+                data = {"title": title}
+                
+                res = requests.post(f"{API_URL}/datasets/upload", headers=headers, files=files, data=data)
+                
+                if res.status_code == 201:
+                    # Update to the new dataset ID
+                    st.session_state.dataset_id = res.json()["dataset_id"]
+                    # Clear the chat history so the screen is blank for the new dataset
+                    st.session_state.messages = []
+                    st.rerun()
+                else:
+                    st.error("Upload failed. Please check your file.")
 
 # --- MAIN CHAT INTERFACE ---
 st.header("Ask your Data Anything 💡")
@@ -112,11 +111,9 @@ else:
                             if len(df) > 10:
                                 fig = px.bar(df, x=y_col, y=x_col, orientation='h', title=f"{y_col} by {x_col}")
                                 fig.update_layout(yaxis={'categoryorder':'total ascending'})
-                                # Show numbers directly on horizontal bars
                                 fig.update_traces(texttemplate='%{x:,.0f}', textposition='outside')
                             else:
                                 fig = px.bar(df, x=x_col, y=y_col, title=f"{y_col} by {x_col}")
-                                # Show numbers directly on vertical bars
                                 fig.update_traces(texttemplate='%{y:,.0f}', textposition='outside')
                             st.plotly_chart(fig, use_container_width=True)
                             
@@ -141,11 +138,10 @@ else:
     question = st.chat_input("E.g., Show me the top 10 cities by total sales...")
     
     if question:
-        # Append user question to history and instantly render it
         st.session_state.messages.append({"role": "user", "content": question})
         st.rerun()
 
-    # 3. Trigger API Call (Runs only if the last message was from the user)
+    # 3. Trigger API Call 
     if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
         with st.spinner("Generating insights..."):
             headers = {"Authorization": f"Bearer {st.session_state.token}"}
