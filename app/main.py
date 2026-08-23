@@ -4,7 +4,7 @@ from .db import models
 from .db.database import engine, Base
 from .routers import auth, datasets, query
 
-Base.metadata.drop_all(bind=engine)
+#Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
