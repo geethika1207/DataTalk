@@ -83,7 +83,7 @@ def generate_query_plan(metadata: list, question: str, filepath: str) -> dict:
                 "x_axis": "column_name_or_alias_for_labels",
                 "y_axis": "column_name_or_alias_for_values"
             }},
-            "explanation": "Clear, concise natural language explanation of the generated analysis."
+            "explanation": "Clear, concise natural language explanation of the generated analysis and give explination in 3 to 4 lines."
         }}
     """
     
