@@ -57,4 +57,7 @@ async def upload_dataset(
     db.commit()
     db.refresh(new_dataset)
     
-    return {"Summary" : dataset_metadata}
+    return {
+        "message": "Dataset processed successfully",
+        "dataset_id": new_dataset.id
+    }

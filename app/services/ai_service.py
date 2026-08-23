@@ -17,7 +17,6 @@ def ask_groq(prompt: str) -> dict:
     
     raw = response.choices[0].message.content.strip()
     
-    # Your manual fallback cleaning (Great defensive programming!)
     if raw.startswith("```json"):
         raw = raw[7:]
     elif raw.startswith("```"):
