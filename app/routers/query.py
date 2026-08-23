@@ -5,11 +5,11 @@ from ..db.database import get_db
 from ..db import models
 from ..core.security import get_current_user
 from ..services import ai_service
-import duckdb  # Add DuckDB import
+import duckdb  
 
 router = APIRouter()
 
-@router.post("/datasets/{id}/queries", status_code=status.HTTP_201_CREATED)
+@router.post("/dataset/{id}/queries", status_code=status.HTTP_201_CREATED)
 async def create_query(
     id: int,
     question: query.QueryRequest,
@@ -35,7 +35,7 @@ async def create_query(
             filepath=dataset.filepath
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail="AI processing failed.")
+        raise HTTPException(status_code=500, detail=str(e))
         
     # Extract the AI's explanation and chart plan
     answer = plan.get("explanation", "Here is your analysis.")

@@ -16,7 +16,7 @@ class dataset(Base):
     __tablename__ = "Dataset"
 
     id = Column(INTEGER, primary_key = True)
-    filepath = Column(String, unique=True, nullable = False)
+    filepath = Column(String, nullable = False)
     filename = Column(String,  nullable = False)
     title = Column(String, nullable = False)
     summary = Column(JSON, nullable = True)
