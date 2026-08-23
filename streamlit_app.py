@@ -64,7 +64,7 @@ with st.sidebar:
         uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
         title = st.text_input("Dataset Title", value="My Dataset")
         
-        if uploaded_file and st.button("Upload & Start Fresh"):
+        if uploaded_file and st.button("Upload & Analyze"):
             with st.spinner("Parsing new dataset structure..."):
                 headers = {"Authorization": f"Bearer {st.session_state.token}"}
                 files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "text/csv")}
