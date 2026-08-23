@@ -6,6 +6,7 @@ from ..db.database import get_db
 from ..schemas import dataset, user
 from ..core import security
 from ..db import models
+from ..core.security import get_current_user
 
 router = APIRouter()
 

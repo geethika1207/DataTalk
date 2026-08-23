@@ -2,7 +2,7 @@ import pandas as pd
 from fastapi import HTTPException
 import json
 
-def create_summary(filepath):
+def extract_schema(filepath):
     try:
         # Convert the CSV into a DataFrame
         df = pd.read_csv(filepath)
@@ -26,7 +26,7 @@ def create_summary(filepath):
             schema_metadata.append(col_dictionary)
             
         # Convert the Python list into a JSON string so it stores safely in the database
-        return json.dumps(schema_metadata)
+        return schema_metadata
     
     except HTTPException:
         raise

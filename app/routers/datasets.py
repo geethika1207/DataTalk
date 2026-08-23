@@ -1,11 +1,11 @@
 from fastapi import APIRouter, File, UploadFile, Form, Depends, HTTPException, status
 import os
 import time
-import shutil  # 👈 Added shutil import
+import shutil 
 from sqlalchemy.orm import Session
 from ..db.database import get_db
 from ..db import models
-from ..services.csv_service import create_summary
+from ..services.extract_metadata import extract_schema
 from ..core.security import get_current_user
 from ..schemas import dataset
 from pathlib import Path
@@ -42,19 +42,19 @@ async def upload_dataset(
         raise HTTPException(status_code=500, detail=f"Could not save file: {e}")
 
         
-    summary = create_summary(filepath)
+    dataset_metadata = extract_schema(filepath)
     
     # create a new row in database
     new_dataset = models.dataset(
         filename=filename,
-        filepath=filepath,
+        filepath=str(filepath),
         title=title,
         user_id=current_user.id,
-        summary=summary
+        summary=dataset_metadata
     )
     
     db.add(new_dataset)
     db.commit()
     db.refresh(new_dataset)
     
-    return {"message": "dataset successfully created", "id": new_dataset.id}
+    return {"Summary" : dataset_metadata}

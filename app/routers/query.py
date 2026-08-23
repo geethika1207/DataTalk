@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..db.database import get_db
 from ..db import models
 from ..core.security import get_current_user
-from ..services import ai_service, csv_service
+from ..services import ai_service
 router = APIRouter()
 @router.post("/datasets/{id}/queries",status_code = status.HTTP_201_CREATED)
 async def create_query(
