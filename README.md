@@ -20,6 +20,28 @@ Test the active platform live:
 
 ## 🛠️ Built With
 
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688)
+
+![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B)
+
+![DuckDB](https://img.shields.io/badge/DuckDB-Analytics-FFA500)
+
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791)
+
+![Pandas](https://img.shields.io/badge/Pandas-Data%20Processing-150458)
+
+![Plotly](https://img.shields.io/badge/Plotly-Visualizations-3f4f75)
+
+![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3-f55036)
+
+![Architecture](https://img.shields.io/badge/Architecture-Decoupled%20Microservice-ff6b35)
+
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+![Status](https://img.shields.io/badge/Status-Active-success)
+
 ---
 
 ## 🛠️ Technical Overview
