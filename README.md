@@ -15,7 +15,7 @@ To achieve this, I engineered a production-grade pipeline featuring a **FastAPI 
 Test the active platform live:
 
 * **Frontend UI (Streamlit):** [https://datatalk-app.streamlit.app](https://www.google.com/search?q=https://datatalk-app.streamlit.app) *(Replace with your actual Streamlit link)*
-* **Backend API (FastAPI Base URL):** [https://datatalk-1-qlhh.onrender.com](https://datatalk-1-qlhh.onrender.com)
+* **Backend API (FastAPI Base URL):** [https://datatalk-1-qlhh.onrender.com/docs](https://datatalk-1-qlhh.onrender.com/docs)
 ---
 
 ## 🛠️ Built With
