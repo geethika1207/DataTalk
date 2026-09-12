@@ -64,29 +64,40 @@ Test the active platform live:
 
 DataTalk adopts a decoupled, microservice-style architecture that cleanly separates the heavy backend analytical engine from the lightweight frontend client.
 
-```text
-User Browser
-    │
-    ▼
-Streamlit Frontend (Community Cloud)
-(Handles session state, chat history, Plotly rendering)
-    │
-    ▼ [REST API / requests]
-    │
-FastAPI Backend (Render)
-    │
-    ├──► PostgreSQL (JWT Auth & User Verification)
-    │
-    ├──► DuckDB / Pandas (CSV Ingestion & SQL Query Execution)
-    │
-    └──► Groq API (Prompt Construction & Insight Generation)
-    │
-    ▼
-Structured JSON Response (Answer + Chart Configuration)
-    │
-    ▼
-Streamlit Renders Smart Visualizations & Metrics
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer"]
+        UI["🎨 Streamlit Frontend Application<br/>• Persistent st.session_state chat history<br/>• Multi-tab reactive UI and CSV file uploader<br/>• Interactive Plotly chart renderer with zoom and hover"]
+    end
 
+    subgraph Gateway ["FastAPI Gateway and Security Layer"]
+        Auth["🛡️ JWT Authentication and Bcrypt Hashing<br/>• Endpoint authorization and session isolation"]
+        UploadHandler["📁 Dataset Upload Controller<br/>• Streams CSV to disk and triggers immediate schema indexing"]
+        QueryHandler["⚡ Query Execution Router (/dataset/id/queries)<br/>• Coordinates AI planning with in-memory execution"]
+    end
+
+    subgraph AnalyticsEngine ["Analytical and Storage Engine"]
+        DB_Postgres[("🗄️ PostgreSQL Database<br/>• Users table & Datasets metadata table<br/>• Persists column schema and 5-row sample caches")]
+        DuckDB_Engine["⚡ DuckDB High-Performance Analytical Engine<br/>• Direct C++ vectorized SQL execution over CSV files<br/>• Sub-millisecond aggregations without database imports"]
+    end
+
+    subgraph AIIntelligence ["AI SQL Planning Engine (Groq API)"]
+        SchemaExtractor["🔍 Metadata Introspection Engine<br/>• Extracts column names, data types, and non-null samples"]
+        GroqPlanner["🤖 Groq API (openai/gpt-oss-120b / LLaMA 3.3)<br/>• Generates safe DuckDB SQL queries<br/>• Decides optimal chart type and axes mappings<br/>• Synthesizes plain-English insights"]
+    end
+
+    %% Flow connections
+    UI -->|1. Upload CSV File| UploadHandler
+    UploadHandler --> SchemaExtractor
+    SchemaExtractor -->|Persist Schema Metadata| DB_Postgres
+    
+    UI -->|2. Natural Language Question| QueryHandler
+    QueryHandler -->|Fetch Dataset Metadata| DB_Postgres
+    QueryHandler -->|Inject Schema Context| GroqPlanner
+    GroqPlanner -->|Return SQL Query + Chart Config| QueryHandler
+    QueryHandler -->|Execute Generated SQL| DuckDB_Engine
+    DuckDB_Engine -->|Aggregated Result DataFrame| QueryHandler
+    QueryHandler -->|Structured JSON: Answer + Plotly Config + Data| UI
 ```
 
 ---
@@ -98,6 +109,40 @@ Streamlit Renders Smart Visualizations & Metrics
 * **Persistent Chat History:** Replaced single-response UI states with a persistent `st.session_state.messages` array, allowing users to scroll, compare past charts, and maintain conversational context.
 * **Automated Context Wiping:** Implemented a single-dataset lock per session. When a user uploads a new dataset, the system automatically clears the chat history to provide a fresh workspace and prevent metric confusion.
 * **In-Memory Analytical Processing:** Utilized DuckDB and Pandas on the backend to execute lightning-fast analytical queries directly on the uploaded CSVs without requiring persistent file storage on Render's ephemeral filesystem.
+
+```mermaid
+flowchart TD
+    subgraph IngestionStage ["Phase 1: Zero-Token Schema Introspection"]
+        direction TB
+        RawCSV["📄 Uploaded CSV Dataset"] --> PandasScan["🐼 Pandas Metadata Extractor"]
+        PandasScan --> ColumnTypes["Column Names and Inferred Data Types"]
+        PandasScan --> SampleRows["5 Non-Null Data Samples per Column"]
+        ColumnTypes & SampleRows --> CompactJSON["📋 Compact Metadata Summary (Stored in PostgreSQL)<br/>• Avoids passing massive raw datasets into LLM context"]
+    end
+
+    subgraph PlanningStage ["Phase 2: Context-Aware SQL & Chart Synthesis"]
+        direction TB
+        UserQ["💬 User Natural Language Question<br/>(e.g., 'What are the top 5 states by total sales?')"]
+        CompactJSON --> PromptAssembly["📝 Prompt Assembly Engine<br/>• Injects Schema + Column Quotes Rule + Filepath"]
+        UserQ --> PromptAssembly
+        PromptAssembly --> GroqLLM["🤖 Groq LLM Inference<br/>• Strict JSON schema: sql_query, explanation, chart"]
+        GroqLLM --> OutputValidation["🛡️ JSON Sanitizer & Rule Validation"]
+    end
+
+    subgraph ExecutionStage ["Phase 3: Vectorized In-Memory Execution & Visual Rendering"]
+        direction TB
+        OutputValidation --> DuckDBSQL["⚡ DuckDB In-Memory Execution<br/>duckdb.query(sql_query).df()<br/>• Executes directly over CSV in sub-milliseconds"]
+        DuckDBSQL --> AggregatedData["📊 Aggregated Result Set (Small, clean table)"]
+        AggregatedData --> ChartLogic{"Plotly Smart Rendering Engine"}
+        ChartLogic -->|Categories > 10| HorizBar["📊 Horizontal Bar Chart (Prevents label collision)"]
+        ChartLogic -->|Chronological Trend| LineChart["📈 Interactive Line Trend"]
+        ChartLogic -->|Proportion <= 6| PieChart["🍩 Donut / Pie Breakdown"]
+        ChartLogic -->|Single Metric| StatCard["🔢 High-Impact Metric Callout"]
+    end
+
+    IngestionStage --> PlanningStage
+    PlanningStage --> ExecutionStage
+```
 
 ---
 
@@ -132,6 +177,32 @@ Building a production-grade data analysis system required solving severe bottlen
 | **Crowded Chart Labels** <br>
 
 <br> *Categorical data with too many unique values made x-axis labels unreadable.* | **Smart Rendering Logic:** Added algorithmic checks (`len(df) > 10`) to automatically rotate charts to a horizontal orientation and format exact values directly onto the bars. |
+
+### Decoupled Cloud Deployment Topology
+
+```mermaid
+flowchart TD
+    subgraph FrontendDeployment ["Frontend: Streamlit Community Cloud"]
+        direction TB
+        StreamlitApp["🎨 streamlit_app.py<br/>• Isolated frontend/requirements.txt<br/>• Zero heavy backend dependencies (Prevents build timeouts)<br/>• Manages JWT tokens, session history, and Plotly charts"]
+    end
+
+    subgraph BackendDeployment ["Backend: Render Cloud Platform"]
+        direction TB
+        FastAPIServer["🚀 FastAPI High-Performance Asynchronous Gateway<br/>• Heavy requirements.txt (DuckDB, SQLAlchemy, Groq, Pandas)<br/>• REST API controllers with CORS middleware<br/>• Swagger Docs at /docs"]
+    end
+
+    subgraph ManagedStorage ["External Cloud Managed Infrastructure"]
+        direction TB
+        SupabasePostgres[("🗄️ Managed PostgreSQL (Supabase / Render)<br/>• User credentials with bcrypt hashing<br/>• Historical dataset metadata records")]
+        GroqInference["⚡ Groq LPU Cloud<br/>• Sub-500ms LLM Token Generation"]
+    end
+
+    UserDevice["💻 End-User Web Browser"] -->|HTTPS / UI Traffic| StreamlitApp
+    StreamlitApp -->|Authenticated REST API Calls| FastAPIServer
+    FastAPIServer -->|Async ORM Queries| SupabasePostgres
+    FastAPIServer -->|Schema Prompt Inference| GroqInference
+```
 
 ---
 
